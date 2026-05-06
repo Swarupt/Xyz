@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI Lab – Part A Learning Path</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0a0a0f;
+  color: white;
+  margin: 0;
+}
+
+header {
+  padding: 20px;
+  text-align: center;
+}
+
+h1 span { color: orange; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+.card {
+  background: #1a1a24;
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.card:hover { background: #26263a; }
+
+.view { display:none; }
+.active { display:block; }
+
+.section {
+  background:#1a1a24;
+  margin:15px;
+  padding:15px;
+  border-radius:10px;
+}
+
+button {
+  padding:10px;
+  margin-top:10px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Part A <span>Assignments</span></h1>
+</header>
+
+<div id="list" class="view active">
+<div class="grid" id="grid"></div>
+</div>
+
+<div id="detail" class="view">
+<button onclick="back()">Back</button>
+<div id="content"></div>
+</div>
+
+<script>
+
+const assignments = [
+
+{
+id:1,
+title:"RPC Distributed Application (Factorial)",
+aim:"Client sends number → server returns factorial",
+concepts:[
+"RPC = Remote execution",
+"Client-Server model",
+"Marshalling & Demarshalling",
+"Stub handles communication"
+],
+steps:[
+"Client sends number",
+"Stub packs data",
+"Server calculates factorial",
+"Return result to client"
+],
+questions:[
+"What is RPC?",
+"What is marshalling?",
+"What are RPC issues?"
+]
+},
+
+{
+id:2,
+title:"RMI String Concatenation",
+aim:"Client sends strings → server concatenates",
+concepts:[
+"RMI = Java distributed API",
+"Stub = client side",
+"Skeleton = server side",
+"Remote method invocation"
+],
+steps:[
+"Create interface",
+"Implement server",
+"Start registry",
+"Run client"
+],
+questions:[
+"What is RMI?",
+"Role of stub & skeleton?",
+"Steps of RMI?"
+]
+},
+
+{
+id:3,
+title:"Fuzzy Set Operations",
+aim:"Perform union, intersection, complement",
+concepts:[
+"Membership function (0 to 1)",
+"Union = max",
+"Intersection = min",
+"Complement = 1 - value"
+],
+steps:[
+"Define fuzzy sets",
+"Apply operations",
+"Create relations",
+"Perform max-min composition"
+],
+questions:[
+"What is fuzzy set?",
+"What is max-min composition?",
+"Difference vs complement?"
+]
+},
+
+{
+id:4,
+title:"Load Balancing Simulation",
+aim:"Distribute requests among servers",
+concepts:[
+"Round Robin",
+"Least Connections",
+"Load distribution",
+"Server optimization"
+],
+steps:[
+"Simulate requests",
+"Apply round robin",
+"Apply least connection",
+"Compare outputs"
+],
+questions:[
+"What is load balancing?",
+"Round robin working?",
+"Least connection?"
+]
+},
+
+{
+id:5,
+title:"Genetic Algorithm Optimization",
+aim:"Optimize parameters using GA",
+concepts:[
+"Population",
+"Selection",
+"Crossover",
+"Mutation"
+],
+steps:[
+"Initialize population",
+"Evaluate fitness",
+"Apply crossover",
+"Apply mutation",
+"Select best"
+],
+questions:[
+"What is GA?",
+"What is fitness?",
+"What is mutation?"
+]
+},
+
+{
+id:6,
+title:"Clonal Selection Algorithm",
+aim:"Implement CLONALG",
+concepts:[
+"Antibodies = solutions",
+"Affinity = fitness",
+"Cloning",
+"Hypermutation"
+],
+steps:[
+"Initialize antibodies",
+"Select best",
+"Clone",
+"Mutate",
+"Replace"
+],
+questions:[
+"What is CLONALG?",
+"What is hypermutation?",
+"Phases of CLONALG?"
+]
+},
+
+{
+id:7,
+title:"Neural Style Transfer",
+aim:"Combine content + style images",
+concepts:[
+"Content image",
+"Style image",
+"Content loss",
+"Style loss"
+],
+steps:[
+"Load images",
+"Extract features (CNN)",
+"Compute loss",
+"Optimize image"
+],
+questions:[
+"What is NST?",
+"Content vs style?",
+"Loss functions?"
+]
+}
+
+];
+
+function load(){
+const grid=document.getElementById("grid");
+grid.innerHTML=assignments.map(a=>
+`<div class="card" onclick="openDetail(${a.id})">
+<h3>${a.title}</h3>
+<p>${a.aim}</p>
+</div>`
+).join('');
+}
+
+function openDetail(id){
+const a=assignments.find(x=>x.id===id);
+
+document.getElementById("content").innerHTML=
+`
+<h2>${a.title}</h2>
+
+<div class="section">
+<h3>Aim</h3>
+<p>${a.aim}</p>
+</div>
+
+<div class="section">
+<h3>Key Concepts</h3>
+<ul>${a.concepts.map(c=>`<li>${c}</li>`).join('')}</ul>
+</div>
+
+<div class="section">
+<h3>Steps</h3>
+<ol>${a.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+</div>
+
+<div class="section">
+<h3>Viva Questions</h3>
+<ul>${a.questions.map(q=>`<li>${q}</li>`).join('')}</ul>
+</div>
+`;
+
+document.getElementById("list").classList.remove("active");
+document.getElementById("detail").classList.add("active");
+}
+
+function back(){
+document.getElementById("detail").classList.remove("active");
+document.getElementById("list").classList.add("active");
+}
+
+load();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI Lab — Learning Path</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --accent1: #ff6b35;
+    --accent2: #00d4aa;
+    --accent3: #a855f7;
+    --accent4: #f59e0b;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(168,85,247,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168,85,247,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 40px 32px 0;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 4px 10px;
+    border-radius: 2px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+  }
+  h1 span { color: var(--accent1); }
+  .subtitle {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 32px;
+    letter-spacing: 1px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto 36px;
+    padding: 0 32px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent3), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+
+  /* MAIN */
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ASSIGNMENT GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .card:hover {
+    border-color: var(--accent3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(168,85,247,0.15);
+  }
+  .card.done { border-color: var(--accent2); }
+  .card.done::before { background: var(--accent2); }
+  .card:not(.done)::before { background: var(--border); }
+
+  .card-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    opacity: 0.15;
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+    line-height: 1;
+  }
+  .card h3 {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .card p {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .card-footer {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .card.done .status-dot { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+  .tag-pill {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* DETAIL VIEW */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-bottom: 32px;
+    background: var(--surface);
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--accent3); }
+
+  .detail-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 36px;
+    padding: 28px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    border-top: 3px solid var(--accent1);
+  }
+  .detail-num {
+    font-family: var(--mono);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--accent1);
+    opacity: 0.6;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .detail-meta { flex: 1; }
+  .detail-meta .badge { margin-bottom: 10px; }
+  .detail-meta h2 {
+    font-weight: 800;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .detail-meta .aim {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 28px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 14px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-icon { font-size: 14px; }
+  .section-body { padding: 20px; }
+
+  /* Concept cards */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .concept-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    border-left: 3px solid;
+  }
+  .concept-item strong {
+    display: block;
+    font-size: 12px;
+    font-family: var(--mono);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent3);
+    color: white;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Q&A */
+  .qa-list { display: flex; flex-direction: column; gap: 10px; }
+  .qa-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .qa-q {
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+    gap: 12px;
+  }
+  .qa-q:hover { background: var(--border); }
+  .qa-toggle {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--accent3);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .qa-a {
+    display: none;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #c0c0d0;
+    line-height: 1.7;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+  }
+  .qa-item.open .qa-a { display: block; }
+  .qa-item.open .qa-toggle { transform: rotate(45deg); }
+
+  /* Flash cards */
+  .flashcard-wrap { perspective: 1000px; margin-bottom: 16px; }
+  .flashcard {
+    width: 100%;
+    height: 140px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    backface-visibility: hidden;
+  }
+  .flashcard-front {
+    background: var(--surface);
+    border: 1px solid var(--accent3);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .flashcard-back {
+    background: linear-gradient(135deg, #1a1230, #131a24);
+    border: 1px solid var(--accent2);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent2);
+    transform: rotateY(180deg);
+    line-height: 1.6;
+  }
+  .flash-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  /* Mark done button */
+  .mark-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: 2px solid var(--accent2);
+    background: transparent;
+    color: var(--accent2);
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .mark-btn:hover { background: var(--accent2); color: var(--bg); }
+  .mark-btn.done-btn {
+    background: var(--accent2);
+    color: var(--bg);
+    border-color: var(--accent2);
+  }
+
+  /* Section colors */
+  .c1 { color: var(--accent1); border-color: var(--accent1); }
+  .c2 { color: var(--accent2); border-color: var(--accent2); }
+  .c3 { color: var(--accent3); border-color: var(--accent3); }
+  .c4 { color: var(--accent4); border-color: var(--accent4); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    header, .progress-wrap, main { padding-left: 16px; padding-right: 16px; }
+    .detail-header { flex-direction: column; gap: 12px; }
+    .detail-num { font-size: 32px; }
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card { animation: fadeUp 0.4s ease both; }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4) { animation-delay: 0.2s; }
+  .card:nth-child(5) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">417534 · Computational Intelligence Lab</div>
+  <h1>Part B <span>Assignments</span></h1>
+  <p class="subtitle">// INTERACTIVE LEARNING PATH · ADYPSOE · AI&DS DEPARTMENT</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span>PROGRESS</span>
+    <span id="progress-text">0 / 5 completed</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<main>
+  <!-- LIST VIEW -->
+  <div class="view active" id="view-list">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div class="view" id="view-detail">
+    <button class="back-btn" onclick="showList()">← Back to assignments</button>
+    <div id="detail-content"></div>
+  </div>
+</main>
+
+<script>
+const assignments = [
+  {
+    id: 1,
+    group: "Part B",
+    num: "B1",
+    color: "c1",
+    title: "Artificial Immune Pattern Recognition (AIPR) for Structure Damage Classification",
+    aim: "Apply AIPR to classify structural damage in infrastructure components using the immune system analogy.",
+    tags: ["AIS", "Classification", "Python"],
+    concepts: [
+      { label: "AIPR", text: "Inspired by the human immune system. Antigens = data patterns; Antibodies = classifiers.", color: "c1" },
+      { label: "Antigens", text: "Represent patterns/instances from the dataset (vectors/matrices of features).", color: "c2" },
+      { label: "Antibodies", text: "Randomly initialized classifiers that evolve through affinity maturation.", color: "c3" },
+      { label: "Affinity Maturation", text: "Antibodies undergo mutation and selection to improve recognition of antigens.", color: "c4" },
+      { label: "Data Preprocessing", text: "Cleaning → Normalization → Feature Extraction → Dimensionality Reduction → Encoding → Balancing → Partitioning.", color: "c1" },
+      { label: "Classification", text: "Measure similarity (Euclidean/Cosine) between new antigen and antibodies; classify by highest affinity.", color: "c2" }
+    ],
+    steps: [
+      "Collect structural damage data (buildings, bridges, roads)",
+      "Preprocess: clean, normalize (Min-Max / Z-score), extract features, apply PCA for dimensionality reduction",
+      "Represent data as antigens (feature vectors)",
+      "Initialize random antibodies (potential classifiers)",
+      "Run affinity maturation: mutate and select antibodies to improve antigen recognition",
+      "Train: expose antibodies to antigens, adjust affinities based on similarity",
+      "Classify new damage instances using highest-affinity antibody",
+      "Evaluate using Accuracy, Precision, Recall, F1-score; fine-tune and repeat"
+    ],
+    flashcards: [
+      { q: "What is AIPR inspired by?", a: "The human immune system's ability to recognize and respond to foreign pathogens using antigens and antibodies." },
+      { q: "What do Antigens represent in AIPR?", a: "Patterns or instances from the dataset — each antigen has specific features of a data point (e.g. structural damage features)." },
+      { q: "What is Affinity Maturation?", a: "An evolutionary process where antibodies undergo mutation and selection to improve their ability to recognize antigens." },
+      { q: "Which normalization techniques are used in AIPR preprocessing?", a: "Min-Max scaling and Z-score normalization to ensure features contribute equally." },
+      { q: "How is classification done in AIPR?", a: "By measuring similarity (e.g. Euclidean distance) between a new antigen and all antibodies; classify using the antibody with highest affinity." }
+    ],
+    questions: [
+      { q: "Describe AIS (Artificial Immune System).", a: "AIS is a class of computationally intelligent systems inspired by the principles and processes of the vertebrate immune system. It uses concepts like antibodies, antigens, clonal selection and immune memory to solve problems like classification, optimization and anomaly detection." },
+      { q: "Explain Data Representation in AIS.", a: "In AIS, data is represented as antigens (input patterns) and antibodies (candidate solutions/classifiers). Each antigen encapsulates feature vectors of the data. For structural damage classification, antigens may include material properties, geometric characteristics, and environmental conditions." },
+      { q: "Define Data Cleaning & Feature Extraction.", a: "Data Cleaning: Removing noise, irrelevant information, and handling missing values (by imputation or removal) from the raw dataset. Feature Extraction: Deriving relevant features from raw data that capture important characteristics — can include statistical measures, frequency domain analysis, or domain-specific features." },
+      { q: "Why is there a need for AIS?", a: "AIS is needed for complex pattern recognition tasks where traditional algorithms struggle. It offers adaptive learning, self-organization, distributed memory, and robustness to noise — making it suitable for structural damage classification, anomaly detection, and optimization problems." }
+    ]
+  },
+  {
+    id: 2,
+    group: "Part B",
+    num: "B2",
+    color: "c2",
+    title: "Implement DEAP (Distributed Evolutionary Algorithms) using Python",
+    aim: "Use the DEAP framework to implement and understand distributed evolutionary algorithms including genetic algorithms.",
+    tags: ["DEAP", "GA", "Python", "Evolutionary"],
+    concepts: [
+      { label: "DEAP", text: "Distributed Evolutionary Algorithms in Python — a framework for rapid prototyping of evolutionary algorithms.", color: "c2" },
+      { label: "Creator Module", text: "Creates custom types like FitnessMin and Individual from base classes in one line.", color: "c3" },
+      { label: "Toolbox", text: "Container for tools: initializers, operators (crossover, mutation, selection), and evaluation functions.", color: "c4" },
+      { label: "Fitness", text: "Defined with weights: (-1.0,) for minimization, (1.0,) for maximization.", color: "c1" },
+      { label: "Operators", text: "cxTwoPoint (crossover), mutGaussian (mutation), selTournament (selection).", color: "c2" },
+      { label: "Algorithm Loop", text: "Evaluate population → Select offspring → Clone → Crossover → Mutate → Re-evaluate → Replace population.", color: "c3" }
+    ],
+    steps: [
+      "Install DEAP: pip install deap",
+      "Import base, creator, tools from deap",
+      "Create FitnessMin/Max class using creator.create()",
+      "Create Individual class (e.g., list with fitness attribute)",
+      "Register initialization functions in Toolbox (attribute, individual, population)",
+      "Register operators: mate (cxTwoPoint), mutate (mutGaussian), select (selTournament), evaluate",
+      "Write main algorithm: initialize population, evaluate fitnesses",
+      "Loop for NGEN generations: select, clone, crossover (CXPB), mutate (MUTPB), re-evaluate invalid, replace population",
+      "Return best individual"
+    ],
+    flashcards: [
+      { q: "What does DEAP stand for?", a: "Distributed Evolutionary Algorithms in Python — a framework for rapid prototyping of evolutionary computation ideas." },
+      { q: "How do you create a minimization fitness in DEAP?", a: "creator.create('FitnessMin', base.Fitness, weights=(-1.0,)) — negative weight means minimize." },
+      { q: "What is the Toolbox in DEAP?", a: "A container that stores all tools: initialization functions, operators (crossover, mutation, selection), and evaluation functions, registered by name." },
+      { q: "What operators are used in a basic DEAP GA?", a: "cxTwoPoint (two-point crossover), mutGaussian (Gaussian mutation), selTournament (tournament selection)." },
+      { q: "What are CXPB and MUTPB in DEAP?", a: "CXPB = crossover probability (e.g. 0.5); MUTPB = mutation probability (e.g. 0.2). They control how often genetic operators are applied." }
+    ],
+    questions: [
+      { q: "What is DEAP and what are its key features in evolutionary computation?", a: "DEAP (Distributed Evolutionary Algorithms in Python) is a novel evolutionary computation framework for rapid prototyping. Key features: supports any representation (list, array, tree, numpy); genetic programming with prefix trees; evolution strategies (CMA-ES); multi-objective optimization (NSGA-II, NSGA-III, SPEA2); co-evolution of multiple populations; parallelization with multiprocessing/SCOOP; Hall of Fame; checkpoints; benchmarks module; genealogy tracking." },
+      { q: "Explain the role of the creator module in DEAP.", a: "The creator module creates custom types by inheriting from existing ones. Example: creator.create('FitnessMin', base.Fitness, weights=(-1.0,)) creates a minimization fitness; creator.create('Individual', list, fitness=creator.FitnessMin) creates an individual as a list with a fitness attribute. This is done in a single line and forms the foundation of any DEAP problem." },
+      { q: "What is a Toolbox in DEAP? How is it used?", a: "The Toolbox is a container from base.Toolbox(). You register functions using toolbox.register('name', function, *args). It stores: initialization (attribute, individual, population), operators (mate=cxTwoPoint, mutate=mutGaussian, select=selTournament), and evaluation (evaluate). Functions are renamed for generic algorithm use, decoupling operator names from implementation." },
+      { q: "Describe the working of a genetic algorithm in DEAP.", a: "1. Initialize population. 2. Evaluate fitness of all individuals. 3. For each generation: select offspring (selTournament), clone them, apply crossover (cxTwoPoint) with probability CXPB, apply mutation (mutGaussian) with probability MUTPB, re-evaluate individuals with invalid fitness, replace old population with offspring. 4. Repeat for NGEN generations. 5. Return final population." }
+    ]
+  },
+  {
+    id: 3,
+    group: "Part B",
+    num: "B3",
+    color: "c3",
+    title: "Distributed MapReduce Application to Find Coolest/Hottest Year",
+    aim: "Design a distributed application using Hadoop MapReduce to process large-scale weather data and identify the coolest and hottest year.",
+    tags: ["MapReduce", "Hadoop", "Java", "Distributed"],
+    concepts: [
+      { label: "MapReduce Model", text: "Map Phase: (Raw records) → (Year, Temperature). Reduce Phase: (Year, [Temps]) → (Year, Avg Temp).", color: "c3" },
+      { label: "HDFS", text: "Hadoop Distributed File System — stores large datasets across multiple nodes.", color: "c4" },
+      { label: "Mapper Class", text: "Extends Mapper<Object, Text, Text, FloatWritable>. Reads CSV, emits (Year, Temperature) pairs.", color: "c1" },
+      { label: "Reducer Class", text: "Extends Reducer<Text, FloatWritable, Text, FloatWritable>. Sums temperatures, counts records, outputs average.", color: "c2" },
+      { label: "Driver Class", text: "Configures and runs the Job: sets mapper, reducer, output key/value types, input/output paths.", color: "c3" },
+      { label: "Shuffle & Sort", text: "Intermediate phase between Map and Reduce — groups all values for same key together.", color: "c4" }
+    ],
+    steps: [
+      "Write WeatherMapper: parse CSV line, extract year (fields[0]) and temperature (fields[3]), emit key-value pair",
+      "Write WeatherReducer: receive (Year, Iterable<FloatWritable>), compute sum/count, write (Year, average)",
+      "Write WeatherDriver: configure Job with mapper/reducer classes, input/output formats, paths",
+      "Compile: javac -classpath `hadoop classpath` -d weather_classes *.java",
+      "Package: jar -cvf weather.jar -C weather_classes/ .",
+      "Upload data to HDFS: hdfs dfs -mkdir /weather && hdfs dfs -put weather.csv /weather",
+      "Run job: hadoop jar weather.jar WeatherDriver /weather /weather_output",
+      "View output: hdfs dfs -cat /weather_output/part-r-00000",
+      "Post-process output to find max avg (hottest year) and min avg (coolest year)"
+    ],
+    flashcards: [
+      { q: "What are the two phases of MapReduce?", a: "Map Phase: processes input records, emits (key, value) pairs. Reduce Phase: receives (key, list of values), aggregates them into final output." },
+      { q: "What does the Mapper emit in the weather application?", a: "It emits (Year, Temperature) as (Text, FloatWritable) key-value pairs for each weather record." },
+      { q: "What does the Reducer compute?", a: "It receives all temperatures for a year, computes the average (sum/count), and outputs (Year, AverageTemperature)." },
+      { q: "What is the Shuffle & Sort phase?", a: "The intermediate phase between Map and Reduce where all values with the same key are grouped together and sorted before being sent to the Reducer." },
+      { q: "What is HDFS?", a: "Hadoop Distributed File System — a distributed storage system that splits large files across multiple nodes for fault-tolerant, high-throughput data access." }
+    ],
+    questions: [
+      { q: "What is MapReduce?", a: "MapReduce is a programming model for distributed data processing. It consists of two phases: Map (processes input records, emits key-value pairs) and Reduce (aggregates values by key). It enables parallel processing of large datasets across a cluster of machines." },
+      { q: "What is the difference between HDFS and MapReduce?", a: "HDFS (Hadoop Distributed File System) is the storage layer — it stores large datasets across multiple nodes with replication for fault tolerance. MapReduce is the processing layer — it's the programming model that reads from HDFS, processes data in parallel, and writes results back to HDFS." },
+      { q: "What happens during the shuffle and sort phase?", a: "After the Map phase, the framework automatically groups all key-value pairs with the same key together (shuffle) and sorts them by key (sort) before sending them to the appropriate Reducer. This ensures each Reducer receives all values for a given key." },
+      { q: "Why is distributed processing needed for weather data?", a: "Weather datasets span decades with millions of records — too large for a single machine. Distributed processing using MapReduce: parallelizes computation across multiple nodes, reduces processing time drastically, provides fault tolerance (if one node fails, tasks are rerun), and scales horizontally as data grows." }
+    ]
+  },
+  {
+    id: 4,
+    group: "Part B",
+    num: "B4",
+    color: "c4",
+    title: "Ant Colony Optimization (ACO) for Travelling Salesman Problem",
+    aim: "Implement ACO to solve TSP — find the shortest route visiting all cities exactly once and returning to the start.",
+    tags: ["ACO", "TSP", "Python", "Metaheuristic"],
+    concepts: [
+      { label: "TSP", text: "Travelling Salesman Problem: find shortest Hamiltonian cycle through N cities. NP-Hard — no polynomial solution.", color: "c4" },
+      { label: "Pheromone Trail", text: "Chemical signal deposited by ants on paths. Shorter paths evaporate less, accumulate more pheromone.", color: "c1" },
+      { label: "Pheromone Evaporation", text: "Pheromone decays over time — prevents premature convergence, enables exploration of new paths.", color: "c2" },
+      { label: "Alpha (α)", text: "Controls importance of pheromone trail in path selection probability.", color: "c3" },
+      { label: "Beta (β)", text: "Controls importance of heuristic (distance) information in path selection.", color: "c4" },
+      { label: "ACO vs GA", text: "ACO: pheromone-based, swarm intelligence, good for graphs. GA: population-based, crossover/mutation, general optimization.", color: "c1" }
+    ],
+    steps: [
+      "Define distance matrix for all city pairs",
+      "Initialize pheromone matrix (equal small values on all edges)",
+      "For each iteration: place N ants at random start cities",
+      "Each ant builds a tour: select next city using probability formula (pheromone^α × (1/distance)^β)",
+      "Calculate total tour length for each ant",
+      "Update pheromone matrix: evaporate all trails (× (1-ρ)), then deposit pheromone on paths used (Δτ = Q/L)",
+      "Track best tour found across all iterations",
+      "Repeat until convergence or max iterations reached",
+      "Output shortest path and its total distance"
+    ],
+    flashcards: [
+      { q: "Why is TSP NP-Hard?", a: "The number of possible routes grows factorially with cities (N-1)!/2 for N cities. No known polynomial-time algorithm can find the optimal solution for all instances." },
+      { q: "What is pheromone evaporation in ACO?", a: "A mechanism where pheromone on all edges decays over time by factor (1-ρ). Prevents premature convergence to suboptimal paths and allows exploration of alternative routes." },
+      { q: "What is the role of alpha (α) in ACO?", a: "Alpha controls the relative importance of pheromone trail strength in the path selection probability. Higher α = ants follow pheromone more aggressively." },
+      { q: "What is the role of beta (β) in ACO?", a: "Beta controls the importance of heuristic information (1/distance) in path selection. Higher β = ants prefer shorter direct distances (greedy behavior)." },
+      { q: "How does ACO differ from Genetic Algorithm?", a: "ACO: swarm-based, pheromone communication, graph traversal, ants cooperate indirectly. GA: population-based, chromosomes, crossover/mutation, individuals compete. ACO suits graph/routing problems; GA suits general combinatorial optimization." }
+    ],
+    questions: [
+      { q: "What is TSP (Travelling Salesman Problem)?", a: "TSP is a combinatorial optimization problem: given N cities and distances between them, find the shortest possible route that visits each city exactly once and returns to the starting city. It's the archetypal NP-Hard problem used to benchmark optimization algorithms." },
+      { q: "Why is TSP NP-Hard?", a: "TSP is NP-Hard because the number of possible routes grows factorially — (N-1)!/2 for N cities. For 20 cities that's ~6×10^16 routes. No polynomial-time algorithm is known to find the optimal solution, making it intractable for large inputs by brute force." },
+      { q: "What is Ant Colony Optimization?", a: "ACO is a metaheuristic optimization algorithm inspired by the foraging behavior of ant colonies (introduced by Marco Dorigo in the 1990s). Artificial ants build solutions by traversing a graph, depositing pheromone on good paths. Subsequent ants probabilistically favor high-pheromone paths, collectively converging to near-optimal solutions." },
+      { q: "What is pheromone evaporation in ACO?", a: "Pheromone evaporation is a mechanism where all pheromone trails decay by a factor (1-ρ) each iteration, where ρ is the evaporation rate. This prevents excessive accumulation on early-found (possibly suboptimal) paths, encourages exploration, and allows the algorithm to adapt as new better solutions are found." },
+      { q: "What is the role of alpha and beta in ACO?", a: "In the probability formula for next city selection: P(i→j) ∝ τ(i,j)^α × η(i,j)^β where τ is pheromone and η=1/d is the heuristic (visibility). Alpha (α) weights pheromone importance — high α = exploitation. Beta (β) weights heuristic importance — high β = greedy short-distance choices." },
+      { q: "Difference between Genetic Algorithm and ACO?", a: "GA: population of chromosomes, crossover+mutation operators, fitness-based selection, generation-by-generation evolution, general optimization. ACO: colony of ants, pheromone communication, probabilistic graph traversal, indirect cooperation via stigmergy, best for graph/routing/scheduling. GA is broader; ACO excels at TSP and similar graph problems." }
+    ]
+  },
+  {
+    id: 5,
+    group: "Part B",
+    num: "B5",
+    color: "c3",
+    title: "Neural Style Transfer (NST) using Deep Learning",
+    aim: "Create artistic images by combining the content of one image with the artistic style of another using CNNs.",
+    tags: ["NST", "CNN", "VGG19", "Deep Learning"],
+    concepts: [
+      { label: "NST", text: "Deep learning technique using CNNs (VGG-19) to blend content of one image with style of another.", color: "c3" },
+      { label: "Content Image", text: "The image whose structural content (objects, shapes) is preserved in the output.", color: "c1" },
+      { label: "Style Image", text: "The image whose artistic style (colors, textures, brush strokes) is transferred to the output.", color: "c4" },
+      { label: "Content Loss", text: "L_content = ½ Σ(F_ij − P_ij)². Measures difference in feature maps between generated and content image.", color: "c2" },
+      { label: "Style Loss", text: "Uses Gram Matrix G = FF^T. Measures difference in texture/style between generated and style image.", color: "c3" },
+      { label: "Total Loss", text: "L_total = α×L_content + β×L_style. Gradient descent minimizes this to generate artistic image.", color: "c4" }
+    ],
+    steps: [
+      "Select content image (structure to preserve) and style image (artistic style to apply)",
+      "Preprocess both images: resize, normalize using ImageNet mean/std for VGG-19",
+      "Load pre-trained VGG-19 model (frozen weights — used only for feature extraction)",
+      "Extract content features from a deep layer of VGG-19 (e.g., conv4_2)",
+      "Extract style features from multiple layers (conv1_1 through conv5_1) using Gram Matrices",
+      "Initialize generated image (copy of content image or random noise)",
+      "Define content loss: MSE between feature maps of generated and content image",
+      "Define style loss: MSE between Gram matrices of generated and style image",
+      "Minimize total loss L = α×L_content + β×L_style using L-BFGS or Adam optimizer",
+      "Iterate optimization steps; output the final artistic image"
+    ],
+    flashcards: [
+      { q: "What is Neural Style Transfer?", a: "A deep learning technique that uses CNNs to combine the content of one image with the artistic style of another, producing a new stylized image by minimizing combined content and style losses." },
+      { q: "Why is VGG-19 used in NST?", a: "VGG-19 is a pre-trained CNN with 19 layers. Its hierarchical feature extraction: lower layers capture textures/edges (style), deeper layers capture high-level content (objects). Pre-training on ImageNet gives it rich, generalizable feature representations." },
+      { q: "What is the Gram Matrix in NST?", a: "G = FF^T, where F is the feature map matrix. The Gram matrix captures correlations between feature channels, encoding texture and style information independent of spatial arrangement." },
+      { q: "Difference between content loss and style loss?", a: "Content loss: MSE between feature maps of generated vs content image — ensures structural similarity. Style loss: MSE between Gram matrices of generated vs style image — ensures texture/artistic style similarity." },
+      { q: "What role does α and β play in NST?", a: "Total loss = α×L_content + β×L_style. α controls how much original content is preserved; β controls how strongly the style is transferred. High β/α ratio → more stylized; low ratio → closer to original content." }
+    ],
+    questions: [
+      { q: "What is Neural Style Transfer and how does it create artistic images?", a: "NST is a deep learning technique that combines content of one image with style of another using CNNs. It extracts content features from a content image and style features from a style image, then iteratively optimizes a generated image to minimize a combined loss function that balances content fidelity and style resemblance." },
+      { q: "What is the role of content image and style image in NST?", a: "Content Image: provides the structural/semantic content (objects, shapes, spatial layout) that the generated image preserves. Style Image: provides artistic characteristics (colors, textures, brush strokes, patterns) that are transferred to the generated image. The output blends both." },
+      { q: "How are CNNs used to extract content and style features in NST?", a: "A pre-trained VGG-19 CNN processes both images. Content features are extracted from deeper convolutional layers (e.g., conv4_2) which capture high-level semantic info. Style features are extracted from multiple layers (conv1_1 to conv5_1) capturing multi-scale texture patterns via Gram matrices." },
+      { q: "Explain content loss and style loss functions in NST.", a: "Content Loss: L_content = ½ Σ(F_ij − P_ij)² — MSE between feature maps of generated image (F) and content image (P) at a specific layer. Style Loss: computed as MSE between Gram matrices (G=FF^T) of the generated image and style image across multiple layers. Gram matrices capture texture correlations independent of spatial location." },
+      { q: "List and explain the key steps of NST.", a: "1. Choose Content & Style Images. 2. Preprocess images (resize, normalize). 3. Load pre-trained VGG-19 (frozen). 4. Extract content features (deep layer). 5. Extract style features (Gram matrices, multiple layers). 6. Initialize generated image. 7. Define content & style loss functions. 8. Minimize total loss L=αL_content+βL_style using gradient descent. 9. Iteratively update generated image. 10. Output final artistic image." }
+    ]
+  }
+];
+
+// State
+let completed = new Set(JSON.parse(localStorage.getItem('ci_lab_done') || '[]'));
+let currentId = null;
+let flashIdx = {};
+
+function saveState() {
+  localStorage.setItem('ci_lab_done', JSON.stringify([...completed]));
+}
+
+function updateProgress() {
+  const n = completed.size;
+  const total = assignments.length;
+  document.getElementById('progress-text').textContent = `${n} / ${total} completed`;
+  document.getElementById('progress-fill').style.width = `${(n/total)*100}%`;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = assignments.map((a, i) => `
+    <div class="card ${completed.has(a.id) ? 'done' : ''}" onclick="showDetail(${a.id})" style="animation-delay:${i*0.07}s">
+      <div class="card-tag ${a.color}">
+        <span>${a.group}</span>
+        ${completed.has(a.id) ? '<span>✓ DONE</span>' : ''}
+      </div>
+      <h3>${a.title}</h3>
+      <p>${a.aim.slice(0,90)}…</p>
+      <div class="card-footer">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${a.tags.map(t => `<span class="tag-pill">${t}</span>`).join('')}
+        </div>
+        <div class="status-dot"></div>
+      </div>
+      <div class="card-num">${a.num}</div>
+    </div>
+  `).join('');
+  updateProgress();
+}
+
+function showDetail(id) {
+  currentId = id;
+  const a = assignments.find(x => x.id === id);
+  flashIdx[id] = flashIdx[id] || 0;
+
+  const isDone = completed.has(id);
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-num ${a.color}">${a.num}</div>
+      <div class="detail-meta">
+        <div class="badge ${a.color}">${a.group} · ${a.tags.join(' · ')}</div>
+        <h2>${a.title}</h2>
+        <p class="aim">${a.aim}</p>
+      </div>
+    </div>
+
+    <!-- Key Concepts -->
+    <div class="section">
+      <div class="section-header"><span class="section-icon">🧠</span> KEY CONCEPTS</div>
+      <div class="section-body">
+        <div class="concept-grid">
+          ${a.concepts.map(c => `
+            <div class="concept-item ${c.color}">
+              <strong>${c.label}</strong>
+              ${c.text}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Steps -->
+    <div class="section">
+      <div class="section-header"><span class="section-icon">⚙️</span> STEP-BY-STEP PROCESS</div>
+      <div class="section-body">
+        <div class="steps">
+          ${a.steps.map((s, i) => `
+            <div class="step">
+              <div class="step-num">${i+1}</div>
+              <div>${s}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Flashcards -->
+    <div class="section">
+      <div class="section-header"><span class="section-icon">🃏</span> FLASHCARDS</div>
+      <div class="section-body">
+        <p class="flash-hint">↓ CLICK CARD TO REVEAL ANSWER · ${a.flashcards.length} CARDS</p>
+        <div id="flashcard-area">
+          ${renderFlashcard(a, flashIdx[id])}
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button onclick="prevCard(${id})" style="flex:1;padding:10px;background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:1px">← PREV</button>
+          <span style="flex:1;text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted);line-height:40px" id="flash-counter">${flashIdx[id]+1} / ${a.flashcards.length}</span>
+          <button onclick="nextCard(${id})" style="flex:1;padding:10px;background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:1px">NEXT →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q&A -->
+    <div class="section">
+      <div class="section-header"><span class="section-icon">❓</span> EXAM QUESTIONS & ANSWERS</div>
+      <div class="section-body">
+        <div class="qa-list">
+          ${a.questions.map((q, i) => `
+            <div class="qa-item" id="qa-${id}-${i}">
+              <div class="qa-q" onclick="toggleQA('${id}-${i}')">
+                <span>${q.q}</span>
+                <span class="qa-toggle">+</span>
+              </div>
+              <div class="qa-a">${q.a}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Mark Done -->
+    <button class="mark-btn ${isDone ? 'done-btn' : ''}" id="mark-btn" onclick="toggleDone(${id})">
+      ${isDone ? '✓ MARKED AS COMPLETE' : 'MARK AS COMPLETE'}
+    </button>
+  `;
+
+  document.getElementById('view-list').classList.remove('active');
+  document.getElementById('view-detail').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function renderFlashcard(a, idx) {
+  return `
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="fc-${a.id}" onclick="flipCard(${a.id})">
+        <div class="flashcard-face flashcard-front">${a.flashcards[idx].q}</div>
+        <div class="flashcard-face flashcard-back">${a.flashcards[idx].a}</div>
+      </div>
+    </div>
+  `;
+}
+
+function flipCard(id) {
+  document.getElementById('fc-'+id).classList.toggle('flipped');
+}
+
+function nextCard(id) {
+  const a = assignments.find(x => x.id === id);
+  flashIdx[id] = (flashIdx[id] + 1) % a.flashcards.length;
+  document.getElementById('flashcard-area').innerHTML = renderFlashcard(a, flashIdx[id]);
+  document.getElementById('flash-counter').textContent = `${flashIdx[id]+1} / ${a.flashcards.length}`;
+}
+
+function prevCard(id) {
+  const a = assignments.find(x => x.id === id);
+  flashIdx[id] = (flashIdx[id] - 1 + a.flashcards.length) % a.flashcards.length;
+  document.getElementById('flashcard-area').innerHTML = renderFlashcard(a, flashIdx[id]);
+  document.getElementById('flash-counter').textContent = `${flashIdx[id]+1} / ${a.flashcards.length}`;
+}
+
+function toggleQA(key) {
+  const el = document.getElementById('qa-'+key);
+  el.classList.toggle('open');
+}
+
+function toggleDone(id) {
+  if (completed.has(id)) {
+    completed.delete(id);
+  } else {
+    completed.add(id);
+  }
+  saveState();
+  const btn = document.getElementById('mark-btn');
+  const isDone = completed.has(id);
+  btn.textContent = isDone ? '✓ MARKED AS COMPLETE' : 'MARK AS COMPLETE';
+  btn.className = 'mark-btn ' + (isDone ? 'done-btn' : '');
+  updateProgress();
+}
+
+function showList() {
+  document.getElementById('view-detail').classList.remove('active');
+  document.getElementById('view-list').classList.add('active');
+  renderGrid();
+  window.scrollTo(0, 0);
+}
+
+// Init
+renderGrid();
+</script>
+</body>
+</html>
